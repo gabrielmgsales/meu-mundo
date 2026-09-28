@@ -1,0 +1,36 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#18342c"><title>Meu Mundo · Vale Verde</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/src/creative.css">
+  <link rel="stylesheet" href="/src/rpg.css">
+</head>
+<body>
+  <canvas id="game" aria-label="Vale Verde: use WASD para explorar e E para interagir"></canvas>
+  <div class="shade"></div>
+  <header>
+    <div><small>MEU MUNDO / UMA VIDA NO VALE</small><h1>Vale Verde</h1><p>Encontre seu lugar. Conte sua história.</p></div>
+    <div class="time"><span>◷</span><b id="clock">16:00</b><small id="day">DIA 01 · PRIMAVERA</small><button id="map-toggle">Mapa · M</button><button id="pause">Pausar · ESC</button></div>
+  </header>
+  <aside class="quest">
+    <small>SEU PRIMEIRO LAR</small><h2>Raízes no vale</h2><p>Um refúgio entre as montanhas.<br>Explore, colha e faça este lugar seu.</p>
+    <div id="objectives"></div><div class="track"><i id="progress"></i></div>
+    <small id="save-status">Progresso salvo neste navegador</small>
+  </aside>
+  <aside class="resources"><small>MOCHILA</small><div id="inventory"></div><button id="prepare-tea" title="2 ervas + 1 água → 3 alimentos">Preparar chá</button></aside>
+  <aside id="map-panel"><div class="map-caption"><small>N ↑</small><span id="coordinates">−3 / 3</span></div><canvas id="minimap" width="240" height="240" aria-label="Mapa do vale ampliado, lago, deck e sua posição"></canvas><small id="explored">0 / 3 lugares descobertos</small><div id="journey"></div></aside>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <div id="interaction"></div>
+  <footer><div class="caption"><small>CONSTRUA SUA HISTÓRIA</small><span id="build-help">Escolha uma construção</span></div><nav id="build-menu" aria-label="Construções"></nav><div class="controls">WASD / SETAS · mover &nbsp; SHIFT · correr &nbsp; E · coletar &nbsp; ARRASTAR · girar &nbsp; SCROLL · zoom &nbsp; M · mapa</div></footer>
+  <div id="pause-screen" hidden role="dialog" aria-modal="true" aria-labelledby="pause-title">
+    <section><small>RESPIRE. O VALE PODE ESPERAR.</small><h2 id="pause-title">Seu mundo,<br>no seu tempo.</h2><p>Explore com WASD. Colete com E e construa pelo menu à esquerda. Arraste para girar a câmera. Cruze o rio pela ponte e siga os marcadores para descobrir novos lugares.</p>
+      <div class="settings"><label for="quality">Qualidade gráfica</label><select id="quality"><option value="low">Leve</option><option value="medium">Equilibrado</option><option value="high">Alto</option></select><label for="volume">Volume ambiente e efeitos</label><input id="volume" type="range" min="0" max="100" value="30"><button id="sound" aria-pressed="true">Som ligado</button></div>
+      <button id="resume">Continuar a aventura →</button><p class="save-note">Construções, descobertas, posição e configurações são salvas neste navegador.</p>
+    </section>
+  </div>
+  <script type="module" src="/src/bootstrap.js"></script>
+</body>
+</html>

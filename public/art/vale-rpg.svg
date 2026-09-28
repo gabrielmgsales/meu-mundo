@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" fill="none">
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1000" gradientUnits="userSpaceOnUse"><stop stop-color="#76c8e5"/><stop offset=".7" stop-color="#f7e7b6"/></linearGradient>
+    <linearGradient id="river" x1="700" x2="950" y1="500" y2="1000" gradientUnits="userSpaceOnUse"><stop stop-color="#72cbca"/><stop offset="1" stop-color="#48a9c2"/></linearGradient>
+    <g id="tree"><path d="M0 0V-95" stroke="#8e684d" stroke-width="13"/><ellipse cy="-105" rx="42" ry="50" fill="#4f956b"/><ellipse cx="-18" cy="-120" rx="29" ry="32" fill="#7cb36a"/><ellipse cx="13" cy="-135" rx="24" ry="28" fill="#9dca78"/></g>
+    <g id="house"><rect x="-74" y="-93" width="148" height="96" rx="6" fill="#f9e0ab" stroke="#7d7256" stroke-width="4"/><path d="M-93-89 0-160 93-89Z" fill="#588cac" stroke="#3e6981" stroke-width="5" stroke-linejoin="round"/><path d="M-65-103H63M-43-120H40" stroke="#91bccb" stroke-width="5"/><path d="M-14 0V-43a14 14 0 0 1 28 0V0" fill="#b27f54"/><rect x="-57" y="-70" width="30" height="32" rx="7" fill="#ffc96b" stroke="#bb9462" stroke-width="4"/><rect x="28" y="-70" width="30" height="32" rx="7" fill="#ffc96b" stroke="#bb9462" stroke-width="4"/><circle cy="-112" r="12" fill="#ffe2a4" stroke="#eef1d4" stroke-width="4"/></g>
+    <g id="cloud" fill="#fffae7"><ellipse rx="86" ry="25"/><ellipse cx="-26" cy="-17" rx="43" ry="30"/><ellipse cx="23" cy="-26" rx="38" ry="37"/></g>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h1600v1000H0z"/>
+  <circle cx="350" cy="183" r="81" fill="#fff0b6" opacity=".4"/><circle cx="350" cy="183" r="57" fill="#fff5c8"/>
+  <use href="#cloud" x="125" y="125" opacity=".8"/><use href="#cloud" x="663" y="166" opacity=".86"/><use href="#cloud" x="1255" y="98" opacity=".66"/>
+  <path d="m-50 640 270-350 223 291 181-248 203 235 203-268 316 303 168-184 153 246H-50Z" fill="#97c5b4"/>
+  <path d="m165 362 55-72 67 88-65-30-32 27Zm412 35 47-64 73 86-57-23-24 18Z" fill="#edf1d9"/>
+  <path d="M-100 660C130 402 281 545 439 572S731 444 900 571s470-124 800 21v450H-100Z" fill="#96bb73"/>
+  <path d="M-70 815C127 525 381 570 602 721S1142 544 1690 735v305H-70Z" fill="#80b368"/>
+  <path d="M925 556c-122 58-294 93-250 167s212 98 29 181l-238 138h668C967 881 764 870 831 794s-205-111 94-238Z" fill="url(#river)"/>
+  <path d="m696 703 39 5m31 91 54 5m-98 127 98 5m43 50 137 6" stroke="#d1f1dc" stroke-width="7" stroke-linecap="round" opacity=".65"/>
+  <path d="M72 1000C140 836 402 905 458 758s-170-75-219-120" stroke="#d9c88b" stroke-width="41"/>
+  <use href="#house" x="240" y="676"/><use href="#house" x="462" y="735" transform="rotate(2 462 735)"/>
+  <g><path d="M597 747 837 807" stroke="#865f49" stroke-width="35"/><path d="M593 732 840 792" stroke="#dfb97a" stroke-width="26"/><path d="m608 710 224 56" stroke="#9b734e" stroke-width="7"/><path d="m610 709-7 49m77-32-7 49m77-31-7 49m78-32-7 49" stroke="#9b734e" stroke-width="8"/></g>
+  <use href="#tree" x="96" y="650"/><use href="#tree" x="158" y="706"/><use href="#tree" x="348" y="672"/><use href="#tree" x="548" y="773"/><use href="#tree" x="74" y="796"/>
+  <use href="#tree" x="1077" y="744"/><use href="#tree" x="1161" y="693"/><use href="#tree" x="1431" y="780"/>
+  <path d="M0 918c202-139 393 15 563 82H0Zm1103 82c123-127 298-160 497-168v168Z" fill="#538b60"/>
+  <g fill="#f4d976"><circle cx="82" cy="910" r="7"/><circle cx="105" cy="929" r="6"/><circle cx="270" cy="796" r="6"/><circle cx="288" cy="810" r="6"/><circle cx="539" cy="903" r="7"/></g>
+  <g fill="#e99b98"><circle cx="362" cy="833" r="8"/><circle cx="379" cy="846" r="6"/><circle cx="217" cy="902" r="7"/></g>
+  <g stroke="#568789" stroke-width="4" stroke-linecap="round"><path d="m534 271 12 5 12-5m47 29 9 4 9-4m-80-7 9 4 9-4"/></g>
+</svg>

@@ -1,0 +1,12 @@
+node_modules/
+dist/
+maintenance-backup/
+.env
+.env.*
+!.env.example
+*.log
+*.lnk
+.DS_Store
+Thumbs.db
+.codex/
+.agents/

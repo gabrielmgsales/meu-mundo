@@ -1,0 +1,46 @@
+/* Bright storybook RPG theme. Keep the compact, left-aligned editing layout. */
+:root{--ink:#35494b;--paper:#fff3d9;--edge:#bda374;--teal:#398d94;--gold:#efbe62;color:var(--ink)}
+button,input,select,summary{-webkit-tap-highlight-color:transparent}button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #d99b43;outline-offset:3px}
+#welcome{background:#9dcccd url('/art/vale-rpg.svg') center/cover no-repeat;gap:8vw}
+.welcome-landscape{background:linear-gradient(90deg,#244d5720,transparent 50%,#30595722)}.welcome-landscape:before,.welcome-landscape i{display:none}
+.welcome-copy{align-self:start;margin-top:6vh;text-shadow:0 2px 0 #fffae577}
+.welcome-copy>small{color:#36565a;font-weight:800;letter-spacing:2.4px}.welcome-copy h1{font-weight:bold;color:#fff5d4;text-shadow:0 4px 0 #447b82,0 6px 18px #2f747655;letter-spacing:-3px}
+.welcome-copy h1 span{font:700 25px Georgia,serif;color:#345866;text-shadow:0 1px #fff4d3;letter-spacing:2px}
+.welcome-copy p{color:#34515a;font-weight:600;font-size:15px;line-height:1.85;text-shadow:0 1px #f8efd5aa}
+.welcome-copy button{background:#fff5dbde;color:#426464;border:2px solid #fff8e6;box-shadow:0 3px 0 #668e8166;font-weight:600;margin-top:18px}
+.world-card{background:#fff4ddf5;border:3px solid #d0b37e;border-radius:20px;box-shadow:0 7px 0 #476b6344,0 22px 65px #2b504d30;color:var(--ink);padding:30px}
+.world-card:before{content:'✦';position:absolute;right:26px;top:23px;color:#cf9c48;font-size:25px}
+.world-card>small{color:#8d6a3e;font-weight:700;letter-spacing:1.5px}.world-card h2{font-weight:bold;color:#385d5b;font-size:29px}
+.world-card label,.world-card h3{color:#6d654d;font-weight:600}.world-card input{background:#fffaf0;color:#3b5150;border:2px solid #dfc99f;border-radius:9px}
+.world-card .primary{background:linear-gradient(#65b3ab,#3a9396);border:2px solid #2e777f;color:#fff9e4;border-radius:10px;box-shadow:0 3px 0 #28646b;transition:filter .15s,transform .15s}
+.world-card .primary:hover{filter:brightness(1.07);transform:translateY(-1px)}.world-card .primary:active{transform:translateY(2px);box-shadow:0 1px 0 #28646b}
+.world-row{border-color:#d6c5a177}.world-play{color:#365b60}.world-play:hover{color:#ad7735}.world-play span,.world-card .local-note,#world-list>p{color:#788171}.rename{color:#6b674e;background:#f1e4c9;border-color:#d3bf96}.delete{color:#fff9e6;background:#8a4f4a;border:1px solid #d38d7f;border-radius:5px;padding:7px;font-size:10px}.rename-form button{color:#fff9e6;background:#4a9090}#menu-error{color:#a84d3e}
+header{color:#fff3cf;text-shadow:0 2px 4px #223f4a88}header h1{font-weight:700;font-size:29px}header small{color:#fff2c4;font-weight:700;letter-spacing:1.5px}
+.time{background:#fff4dfeF;border:2px solid #c6ae80;border-radius:9px;padding:4px 6px;text-shadow:none;box-shadow:0 3px 0 #305b5933;top:69px}.time b{color:#576154;font-weight:700}.time button{background:#e9dec4;color:#4f665e;border:1px solid #cdb98d;border-radius:5px}.time button:hover{background:#d4e5cf}
+#left-rail{background:#fff3dfeF;border:2px solid #d2ba8e;border-radius:12px;box-shadow:0 5px 0 #314e4d33,0 8px 25px #183f4222;scrollbar-color:#baa87566 transparent;color:#405952;top:132px}
+.dock-heading small{color:#8b7950;font-weight:800;letter-spacing:1.2px}.dock-heading button{color:#857249}.catalog-tabs button,#catalog-items button{color:#456258;background:#f3e8ce;border:1px solid #d3c39f;border-bottom:2px solid #c8b68d;border-radius:7px;font-weight:600}
+.catalog-tabs button:hover,#catalog-items button:hover{background:#e1edd8;border-color:#9db690}.catalog-tabs button.active,#catalog-items button.active{background:#4d9d99;border-color:#3b827e;color:#fff8e6}
+#catalog-search,#catalog-category{background:#fffaf0;color:#4a6257;border:1px solid #d6c59f;border-radius:7px}#catalog-search::placeholder{color:#94937b}#creative-help,#catalog-items p{color:#74775e}
+.dock-actions button{color:#42685f;background:#dde9d6;border-color:#b0c3a6;border-radius:6px;font-weight:600}.dock-actions button:hover{background:#cce2c5}
+#left-rail>details{border-color:#d7c5a088}#left-rail summary{color:#77613f;font-weight:700}#left-rail summary:hover{background:#f1e4c8}#left-rail .resource,#left-rail .objective{color:#61745e}#left-rail .resource b{color:#3f6564;font-weight:700}#left-rail .resource i{color:#b38945}#left-rail .quest>small:last-child{color:#77826c}#left-rail .objective.done{color:#40876b}#left-rail .track{background:#dccdaf}#left-rail .track i{background:#5ba697}
+#left-rail #build-menu button{background:#f3e8ce;border-color:#d3c39f;color:#456258;box-shadow:none;border-radius:6px}#left-rail #build-menu button.active{background:#5ca29a;color:#fff7de}#left-rail #build-menu small,#left-rail #build-menu em{color:#8a825f}#left-rail #build-menu button.locked:after{color:#aa8250}
+#prepare-tea{color:#756844;border-color:#cbb78c;background:#efe1c2}#journey button{color:#4f7265;border-color:#d5c8aa}#journey small,#left-rail #map-panel>small,#coordinates{color:#8a7957}
+#object-menu{background:#fff2dff7;border:2px solid #c2a570;box-shadow:0 4px 0 #26474033,0 8px 25px #0002;color:#426259}#object-menu strong{color:#756441}#object-menu button{background:#5b9f91;color:#fff9e9;border-color:#3f8178;border-radius:6px;font-weight:600}#object-menu button:last-child{background:#c68065;border-color:#a46650}
+#interaction{background:#fff4d9e8;color:#5e6652;text-shadow:none;border:2px solid #cab48b;border-radius:10px;box-shadow:0 3px 0 #34554a33}#toast{background:#ffefd9f5;color:#51624f;border:2px solid #c6a776;border-radius:11px;box-shadow:0 4px 0 #2d544344}
+#waypoint{background:#fff3d9e8;color:#716043;text-shadow:none;border-color:#d1b982;border-radius:12px;font-weight:600}#discovery{background:#fff2dcf5;border:3px solid #ddbd7d;border-radius:18px;color:#406968;box-shadow:0 10px 40px #25433b40}#discovery small{color:#a5813d}#discovery p{color:#67765d}
+#pause-screen{background:#26495188}#pause-screen section{background:#fff2db;border:3px solid #d6b77f;border-radius:20px;color:#45635d;box-shadow:0 8px 0 #30504844}#pause-screen small{color:#9d814b}#pause-screen p,.settings label{color:#727960}.settings select{background:#f5e9d0;color:#4d695e;border:1px solid #cdb98a}.settings button{color:#4f786b;border-color:#bdc69b}#resume{background:#58a394;color:#fff8e5;border:2px solid #3f817b;border-radius:9px;font-weight:700}.shade{background:linear-gradient(#31586155,transparent 22%,transparent 85%,#2e655822)}
+@media(max-width:700px){#welcome{background-position:37% center}.welcome-copy{margin-top:0}.welcome-copy h1{font-size:46px}.welcome-copy h1 span{font-size:19px}.world-card{padding:23px}#left-rail{top:125px}.time{top:69px}#interaction{max-width:calc(100vw - 210px)}}
+@media(prefers-reduced-motion:reduce){button{transition:none!important}}
+
+/* Restrained contemporary HUD, shared by the menu and the running world. */
+:root{--ink:#e0e4e4;--paper:#22282d;--edge:#515a60;--teal:#778c89;--gold:#9da99e}
+#welcome{background:radial-gradient(ellipse at 20% 20%,#50616a,#172126 75%)}
+.welcome-landscape{display:none}.welcome-copy,.welcome-copy h1,.welcome-copy h1 span,.welcome-copy p,.welcome-copy>small{color:#e6e8e5;text-shadow:none;font-family:Arial,sans-serif}
+.world-card,#left-rail,.time,#pause-screen>div{background:#20272bee;border:1px solid #596267;border-radius:3px;box-shadow:0 8px 24px #0005;color:#e0e4e4}
+.world-card:before{display:none}.world-card h2,.world-card h3,.world-card label,.world-play,.time b,header,header h1,header small,#left-rail summary,#left-rail .resource,#left-rail .resource b,#left-rail .objective{color:#e0e4e4;font-family:Arial,sans-serif;text-shadow:none}
+#left-rail button,.time button,.world-card button,.welcome-copy button,#pause-screen button{background:#343e43;color:#e1e5e6;border:1px solid #586269;border-radius:2px;box-shadow:none}
+#left-rail button:hover,.world-card button:hover{background:#4c5c62}#left-rail button.active{background:#657972;border-color:#8b9e94}
+#catalog-search,#catalog-category,.world-card input{background:#171e22;color:#e2e6e6;border:1px solid #596469;border-radius:2px}
+.dock-heading small,#creative-help,.world-card>small,.world-card .local-note,.world-play span{color:#b2bdc0}.world-card .primary{background:#526c63}
+
+#toast,#interaction,#discovery,#pause-screen section{background:#20272bf2;color:#e1e5e5;border:1px solid #596469;border-radius:3px;box-shadow:0 5px 18px #0004}#pause-screen h2{font:500 30px Arial,sans-serif}#pause-screen p,.settings label{color:#bbc3c5}#resume{background:#526c63;color:#fff}
