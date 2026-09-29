@@ -93,6 +93,7 @@ export function createEnvironment({
       float wave=sin(surfacePosition.x*5.0+surfacePosition.z*2.0+surfaceTime*1.6)*sin(surfacePosition.z*3.0-surfaceTime);
       vec2 bedUV=(surfacePosition.xz-vec2(-215.,-43.))/vec2(344.,86.);
       float bed=texture2D(bedMap,clamp(bedUV,vec2(0.),vec2(1.))).r;
+      if(bedUV.x<0. || bedUV.x>1. || bedUV.y<0. || bedUV.y>1.) bed=-2.45;
       float depth=max(0.,surfacePosition.y-bed);
       float deep=smoothstep(.15,3.5,depth);
       diffuseColor.rgb*=mix(vec3(1.12,1.08,.86),vec3(.42,.66,.78),deep);

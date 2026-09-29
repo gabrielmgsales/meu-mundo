@@ -71,7 +71,9 @@ export function createWestRegion(scene, M) {
       distance = Math.hypot((x + 40) / 1.6, z);
     const fade = THREE.MathUtils.smoothstep(distance, 180, 600);
     const hills = (Math.sin(x * .003) * Math.cos(z * .004) * 90 + Math.sin(z * .009 + x * .005) * 24 + 70) * fade - 18;
-    pos.setY(i, hills);
+    const outside=Math.max(Math.abs(z)-910, x-1730, -1820-x);
+    const blend=THREE.MathUtils.smoothstep(outside,0,220);
+    pos.setY(i, THREE.MathUtils.lerp(-30,hills,blend));
     const c = new THREE.Color().setHSL(.29 + Math.sin(x * .002) * .025, .24, .37 + fade * .1);
     colors.push(c.r, c.g, c.b);
   }
@@ -83,6 +85,17 @@ export function createWestRegion(scene, M) {
     roughness: 1
   }));
   root.add(horizon);
+  for(let layer=0;layer<3;layer++) {
+    const ridgeGeo=new THREE.PlaneGeometry(5200,1,140,1),rp=ridgeGeo.attributes.position;
+    for(let i=0;i<rp.count;i++){
+      const x=rp.getX(i),top=rp.getY(i)>0;
+      const peak=110+layer*45+Math.abs(Math.sin(x*.003+layer*2))*160+Math.sin(x*.013+layer)*35;
+      rp.setXYZ(i,x,top?peak:-30,-1100-layer*450);
+    }
+    ridgeGeo.computeVertexNormals();
+    const ridge=new THREE.Mesh(ridgeGeo,new THREE.MeshBasicMaterial({color:['#667780','#83939c','#a2afb8'][layer],side:THREE.DoubleSide}));
+    ridge.name='Serra distante '+layer;root.add(ridge);
+  }
   batchStatic(deck);
   return {
     root,

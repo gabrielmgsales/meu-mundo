@@ -1,3 +1,4 @@
+import {createVehicleSound} from './vehicle-audio.js';
 import { daytimeStrength } from './daylight.js';
 
 // A quiet, seamless bed of short cricket chirps, without external audio files.
@@ -92,6 +93,11 @@ export class ValleyAudio {
       this.enabled = false;
     }
   }
+  vehicle(truck,throttle,brake,inside){
+    if(!this.context)return;
+    this.vehicleSound??=createVehicleSound(this.context,this.master);
+    this.vehicleSound.update(truck,throttle,brake,inside);
+  }
   apply() {
     if (this.context) this.master.gain.setTargetAtTime(this.enabled && !this.paused ? this.volume : 0, this.context.currentTime, .12);
   }
@@ -108,15 +114,8 @@ export class ValleyAudio {
     this.streamPan?.pan.setTargetAtTime(pan, this.context.currentTime, .2);
     this.rain?.gain.setTargetAtTime(rain * .22 * (1 - shelter * .8), this.context.currentTime, .8);
     this.echoGain?.gain.setTargetAtTime(shelter * .2, this.context.currentTime, .4);
-    const now = this.context.currentTime;
-    if (!this.nextNote || now > this.nextNote) {
-      const notes = [196, 246.94, 293.66, 369.99, 293.66, 246.94];
-      this.note = ((this.note || 0) + 1) % notes.length;
-      this.tone(notes[this.note], 3.8, 'sine', .065);
-      this.tone(notes[this.note] / 2, 4, 'sine', .035);
-      this.nextNote = now + 3;
-    }
   }
+
   tone(frequency, duration, kind = 'sine', volume = .2, slide = frequency, pan = 0) {
     if (!this.context || !this.enabled || this.paused) return;
     const t = this.context.currentTime,

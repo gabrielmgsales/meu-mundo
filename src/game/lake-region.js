@@ -79,14 +79,24 @@ export function createLakeRegion(scene, M) {
   const material = new THREE.MeshStandardMaterial({
     color: '#c7f0eb',
     transparent: true,
-    opacity: .7,
+    opacity: .42,
+    depthWrite: false,
     roughness: .23,
     side: THREE.DoubleSide
   });
+  const flow={value:0};
+  material.onBeforeCompile=shader=>{
+    shader.uniforms.fallTime=flow;
+    shader.vertexShader='varying vec2 fallUV;\n'+shader.vertexShader;
+    shader.vertexShader=shader.vertexShader.replace('#include <uv_vertex>','#include <uv_vertex>\nfallUV=uv;');
+    shader.fragmentShader='uniform float fallTime; varying vec2 fallUV;\n'+shader.fragmentShader;
+    shader.fragmentShader=shader.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>\nfloat streak=sin(fallUV.x*47.+sin(fallUV.y*18.+fallTime*5.));\ndiffuseColor.a*=.45+.55*smoothstep(-.7,.8,streak);');
+  };
   const height = FALL.top - FALL.bottom;
   for (let i = 0; i < 11; i++) {
-    const stream = new THREE.Mesh(new THREE.CylinderGeometry(.16, .25, height, 8), material);
+    const stream = new THREE.Mesh(new THREE.PlaneGeometry(.45, height, 2, 24), material);
     stream.position.set((i - 5) * .24, height / 2, Math.sin(i) * .08);
+    stream.rotation.y=Math.sin(i*2)*.35;
     waterfall.add(stream);
   }
   const foam = new THREE.Mesh(new THREE.SphereGeometry(1, 24, 10), material);
@@ -95,6 +105,11 @@ export function createLakeRegion(scene, M) {
   waterfall.add(foam);
   const drops = new THREE.InstancedMesh(new THREE.SphereGeometry(.07, 6, 4), material, 90);
   waterfall.add(drops);
+  const mistPositions=new Float32Array(48*3),mistGeo=new THREE.BufferGeometry();
+  mistGeo.setAttribute('position',new THREE.BufferAttribute(mistPositions,3));
+  const mist=new THREE.Points(mistGeo,new THREE.PointsMaterial({color:'#e2eceb',size:.65,transparent:true,opacity:.08,depthWrite:false}));
+  mist.material.onBeforeCompile=shader=>{shader.fragmentShader=shader.fragmentShader.replace('#include <color_fragment>','#include <color_fragment>\n diffuseColor.a*=1.-smoothstep(.05,.5,length(gl_PointCoord-.5));');};
+  waterfall.add(mist);
   const dummy = new THREE.Object3D();
   for (const e of entries) batchStatic(e.g);
   batchStatic(scenery, [...entries.map(e => e.g), ...rocks]);
@@ -107,6 +122,14 @@ export function createLakeRegion(scene, M) {
     rocks,
     tick(dt, time, ripple) {
       if (dt <= 0) return;
+      flow.value=time;
+      for(let j=0;j<48;j++){
+        const age=(time*.23+j/48)%1;
+        mistPositions[j*3]=Math.sin(j*2.4)*(1+age*1.8)+age*.6;
+        mistPositions[j*3+1]=.2+age*2;
+        mistPositions[j*3+2]=.5+Math.cos(j*1.7)*(.6+age);
+      }
+      mistGeo.attributes.position.needsUpdate=true;
       for (let i = 0; i < 90; i++) {
         dummy.position.set(Math.sin(i * 2.4) * 1.4, height - (time * 9 + i * .43) % height, .25 + Math.cos(i) * .25);
         dummy.scale.set(.65, 1.8, .65);

@@ -1,3 +1,4 @@
+import { fishDepth } from './fish-depth.js';
 import { createCreativeCatalog } from './creative-catalog.js';
 import * as THREE from 'three';
 import { inWorld, inLake, onDock, mountainBlocked, LAKE, DOCK, FALL, OVERLOOK, onOverlook, overlookRailing } from './region.js';
@@ -16,6 +17,7 @@ export function createCreative({
   navigation,
   lakeRegion,
   scene,
+  terrainSurfaces = () => [],
   camera,
   renderer,
   ground,
@@ -47,6 +49,7 @@ export function createCreative({
     pitch = 0,
     lakeMap = new Map(),
     waterMesh = null;
+  let cabinYaw=0;
   let fp = data.firstPerson;
   const dummy = new THREE.Object3D();
   const dayBirds = createDayBirds(scene),
@@ -347,8 +350,8 @@ export function createCreative({
   function cameraMode() {
     fp = !fp;
     data.firstPerson = fp;
-    pitch = 0;
-    player.visible = !fp;
+    pitch = 0; cabinYaw=0;
+    player.visible = !fp && !state.truck?.occupied;
     crosshair.hidden = !fp;
     $('camera-mode').textContent = fp ? 'Visão externa · V' : 'Primeira pessoa · V';
     save();
@@ -393,7 +396,7 @@ export function createCreative({
     return o ? entries.get(o.userData.editId) : null;
   }
   function positionHit() {
-    const hits = ray.intersectObjects([ground, water, waterMesh, lakeRegion.lake, ...lakeRegion.rocks], false);
+    const hits = ray.intersectObjects([ground, ...terrainSurfaces(), water, waterMesh, lakeRegion.lake, ...lakeRegion.rocks], false);
     return hits[0] || null;
   }
   function placementError(p, item) {
@@ -514,6 +517,7 @@ export function createCreative({
     return true;
   }
   function click(e) {
+    if(state.truck?.occupied)return toast('Saia da picape para editar o mundo.');
     if (isPaused()) return true;
     cast(e);
     const hit = positionHit();
@@ -846,6 +850,13 @@ export function createCreative({
       });
       const sitting = seat && goal && Math.hypot(goal.x - motion.x, goal.z - motion.z) < .25;
       e.g.position.set(motion.x, sitting ? seat.g.position.y + (e.item.adult ? -.08 : .18) : floor(motion.x, motion.z) + (motion.walking && !fish ? Math.abs(Math.sin(motion.phase)) * (motion.playful ? .12 : .025) : 0), motion.z);
+      if(fish && dt>0) {
+        const level=waterAt(motion.x,motion.z);
+        if(level!==null){
+          const nextY=fishDepth({id:e.record?.id || e.id,time,dt,surface:level,bed:landHeight(motion.x,motion.z),size:e.item.size,current:e.g.userData.swimY});
+          e.g.userData.swimY=nextY;e.g.position.y=nextY;
+        }
+      } else if(fish && Number.isFinite(e.g.userData.swimY))e.g.position.y=e.g.userData.swimY;
       animateAnimal(e.g, motion, dt);
       if (sitting) e.g.rotation.y = seat.g.rotation.y;
       if (person) {
@@ -853,7 +864,7 @@ export function createCreative({
       }
       if (motion.walking && (fish || amphibious) && Math.floor(time * 2) !== Math.floor((time - dt) * 2)) {
         const level = waterAt(motion.x, motion.z);
-        if (level !== null) experience.ripple?.(motion.x, motion.z, level, fish ? .35 : .7);
+        if (level !== null && (!fish || level-e.g.position.y<.65)) experience.ripple?.(motion.x, motion.z, level, fish ? .35 : .7);
       }
     }
   }
@@ -871,6 +882,7 @@ export function createCreative({
         })
       };
     },
+    get cabinLook(){return {yaw:cabinYaw,pitch};},
     get firstPerson() {
       return fp;
     },
@@ -885,6 +897,7 @@ export function createCreative({
     clearPose,
     registerBase,
     terrainHeight: landHeight,
+    waterAt,
     constructionError(x, z, radius) {
       for (const [dx, dz] of [[0, 0], [radius, 0], [-radius, 0], [0, radius], [0, -radius]]) {
         if (onDock(x + dx, z + dz, 1) || onOverlook(x + dx, z + dz, 1) || mountainBlocked(x + dx, z + dz)) return 'Mantenha a montanha e o deck livres.';
@@ -896,7 +909,8 @@ export function createCreative({
       const hit = aimRay.intersectObjects(lakeRegion.rocks, false)[0];
       return !!hit && hit.distance < distance;
     },
-    look(dy) {
+    look(dy,dx=0) {
+      if(fp&&state.truck?.occupied)cabinYaw=THREE.MathUtils.clamp(cabinYaw-dx*.007,-1.8,1.8);
       if (fp) pitch = THREE.MathUtils.clamp(pitch - dy * .004, -1.2, 1.2);
     },
     blocked(x, z) {
@@ -906,12 +920,12 @@ export function createCreative({
       return [...entries.values()].some(e => e.g.visible && !['animal', 'family'].includes(e.kind) && e.kind !== 'furniture' && Math.hypot(x - e.g.position.x, z - e.g.position.z) < (e.radius ?? .45));
     },
     camera(angle, desired, look, dt) {
-      if (fp) {
-        camera.position.set(player.position.x, player.position.y + 1.65, player.position.z);
+      if (fp && !state.truck?.occupied) {
+        camera.position.copy(player.position).add(new THREE.Vector3(0,player.userData.swimming ? .12 : 1.65,0));
         look.set(camera.position.x - Math.sin(angle) * Math.cos(pitch), camera.position.y + Math.sin(pitch), camera.position.z - Math.cos(angle) * Math.cos(pitch));
         camera.lookAt(look);
       } else {
-        const target = player.position.clone().add(new THREE.Vector3(0, 1.3, 0)),
+        const target = player.position.clone().add(new THREE.Vector3(0, player.userData.swimming ? .15 : 1.3, 0)),
           direction = desired.clone().sub(target),
           length = direction.length();
         ray.set(target, direction.clone().normalize());

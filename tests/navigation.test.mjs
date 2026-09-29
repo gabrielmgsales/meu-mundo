@@ -11,8 +11,8 @@ import { createLakeRegion } from '../src/game/lake-region.js';
 const materials=()=>Object.fromEntries(['wood','log','cream','leaf','leaf2','pine','stone','soil','dark','water'].map(k=>[k,new THREE.MeshStandardMaterial({color:'#91a697'})]));
 
 test('playable area includes the doubled western valley; lake has a bed and connects to the waterfall',()=>{
-  assert.equal((WORLD.maxX-WORLD.minX)*(WORLD.maxZ-WORLD.minZ),4*86*86);
-  assert.ok(inWorld(120,30));assert.ok(!inWorld(130,30));assert.ok(!inWorld(-216,0));
+  assert.equal((WORLD.maxX-WORLD.minX)*(WORLD.maxZ-WORLD.minZ),200*344*86);
+  assert.ok(inWorld(120,30));assert.ok(inWorld(640,200));assert.ok(!inWorld(1678,0));assert.ok(!inWorld(-1764,0));
   assert.ok(inLake(FALL.x,FALL.z));assert.ok(terrainHeight(LAKE.x,LAKE.z)<LAKE.level-2);
   assert.ok(!inLake(-3,3));assert.ok(onDock(DOCK.exit.x,DOCK.exit.z));
   assert.ok(Math.abs(terrainHeight(52,10)-DOCK.y)<.4);

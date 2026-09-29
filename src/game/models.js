@@ -1,3 +1,4 @@
+import { windMaterial } from './natural-effects.js';
 import { foliageGeometry } from './foliage.js';
 import { createPerson } from './family.js';
 import * as THREE from 'three';
@@ -137,7 +138,7 @@ export function createTree(item) {
   const c = item.color;
   let seed=0;for(const ch of String(item.visualSeed ?? item.id)) seed=(Math.imul(seed,31)+ch.charCodeAt(0))>>>0;
   const variation=(seed%997)/997, width=1.15+((seed>>>5)%101)/300;
-  const leafMaterial=mat(c);leafMaterial.vertexColors=true;
+  const leafMaterial=mat(c);leafMaterial.vertexColors=true;windMaterial(leafMaterial);
   const trunk = new THREE.Mesh(new THREE.CylinderGeometry(.075,.19,3.8,9),mat('#655c4d'));
   trunk.position.y=1.9;g.add(trunk);
   for(let i=0;i<9;i++) {
@@ -158,7 +159,7 @@ export function createTree(item) {
     const a = i * 2.4;
     part(g, item.id === 'laranjeira' ? '#d89d40' : '#c16f40', Math.cos(a) * 1.35, 2.6 + Math.sin(i) * .45, Math.sin(a) * 1.35, .12, .12, .12);
   }
-  g.scale.set(item.size*width,item.size*(.85+variation*.6),item.size*width);
+  g.scale.set(item.size*width*1.18*1.5,item.size*(1.1+variation*.72)*1.5,item.size*width*1.18*1.5);
   return g;
 }
 export function createFurniture(item) {

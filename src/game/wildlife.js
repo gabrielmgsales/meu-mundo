@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { createItem } from './models.js';
 import { animals } from './catalogs.js';
-import { terrainHeight } from './world-detail.js';
+import { LAKE, inLake } from './region.js';
+import { terrainHeight, riverCenter } from './world-detail.js';
 import { daytimeStrength } from './daylight.js';
 export { daytimeStrength } from './daylight.js';
 function seedFrom(id) {
@@ -216,7 +217,9 @@ export function createDayBirds(scene) {
           path.x = flight.x + (perch.x - flight.x) * landingBlend;
           path.z = flight.z + (perch.z - flight.z) * landingBlend;
         }
-        g.position.set(path.x, terrainHeight(path.x, path.z) + (7 + path.lift) * (1 - landingBlend), path.z);
+        const bed=terrainHeight(path.x,path.z);
+        const surface=inLake(path.x,path.z)?Math.max(bed,LAKE.level):Math.abs(path.x-riverCenter(path.z))<2.4?Math.max(bed,.25):bed;
+        g.position.set(path.x, surface + (7 + path.lift) * (1 - landingBlend), path.z);
         g.scale.setScalar(size * daylight);
         animateAnimal(g, {
           walking: landingBlend < .999,

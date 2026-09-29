@@ -1,3 +1,4 @@
+import {onForestRoad} from './forest-road.js';
 import { grassGeometry } from './foliage.js';
 import * as THREE from 'three';
 import { inWorld, onDock, onOverlook, mountainBlocked } from './region.js';
@@ -60,7 +61,7 @@ export function createGroundLife(scene) {
           if(hash(Math.floor(cx/9),Math.floor(cz/9))<.2)continue;
           // Keep the central village approach clear of the denser plant clusters.
           if(z>-35 && z<36 && Math.abs(x+3-Math.sin(z*.11)*2)<2.2)continue;
-          if (!inWorld(x, z, 2) || onDock(x, z, 2) || onOverlook(x, z, 3) || mountainBlocked(x, z) || context.waterAt?.(x, z) != null || context.detailBlocked?.(x, z) || Math.abs(z) < 1.5) continue;
+          if (onForestRoad(x,z,1) || !inWorld(x, z, 2) || onDock(x, z, 2) || onOverlook(x, z, 3) || mountainBlocked(x, z) || context.waterAt?.(x, z) != null || context.detailBlocked?.(x, z) || Math.abs(z) < 1.5) continue;
           const y = context.landHeight(x, z),
             slope = Math.abs(y - context.landHeight(x + .5, z)) + Math.abs(y - context.landHeight(x, z + .5));
           patch.push({

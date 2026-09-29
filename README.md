@@ -71,3 +71,15 @@ Esta é uma primeira versão com modelos procedurais: os animais usam famílias 
 Os dados ficam no armazenamento local do navegador, separados por endereço. Abrir em outro navegador, outra porta ou apagar os dados do site não transfere os mundos. Falhas de armazenamento são informadas e impedem o botão Mundos de abandonar uma partida ainda não salva.
 
 Testes automatizados cobrem salvamentos, migração, isolamento entre mundos, catálogos, geometria, união de lagos, persistência de edições, colisão, escavação e detalhes animados do cenário. O menu ilustrado e a cena cartunesca foram conferidos no navegador, incluindo primeira pessoa, salvamento e retomada de um mundo de prévia. A qualidade visual em diferentes aparelhos e resoluções ainda pode precisar de ajustes.
+
+## Nado e mergulho
+Ao entrar na ?gua, o personagem assume a posi??o de nado. Setas ou WASD controlam a dire??o; Ctrl ou C mergulha e Espa?o sobe. V alterna a c?mera para ver os peixes de perto. A profundidade ? limitada pelo fundo; sair pela margem retoma a caminhada. Ponte, deck e barco mant?m seus controles.
+
+## Picape e mundo ampliado
+O mapa mede 3.440 x 1.720 metros (200 vezes a area original; 10 vezes a expansao anterior). O vale original permanece no centro; a vegetacao externa carrega por regioes. Uma picape procedural inspirada na Toyota Hilux aparece perto da casa. E ou o botao lateral entra/sai; W/seta cima acelera, S/seta baixo freia e da re, A/D ou setas viram e Espaco freia. Pare para sair. A picape respeita obstaculos, limites e agua; atravesse o rio pelas cinco novas pontes largas com rampas. Posicao e ocupacao sao salvas por mundo. O modelo detalhado segue a Hilux 2026 internacional; e uma construcao procedural, sem CAD oficial.
+
+Na Hilux, V ou o botao de primeira pessoa alterna entre camera externa e cabine. Arraste o mouse para olhar ao redor. A camera acompanha as inclinacoes do carro e o volante acompanha as setas/A/D.
+
+A Hilux agora tem suspensao visual por contato das quatro rodas, inclinacao em curvas e resposta suave ao relevo. Motor e pneus usam audio sintetizado continuo, com frenagem na terra e filtro abafado na cabine; respeitam som, volume e pausa. O painel mostra km/h e recebe iluminacao noturna, com maos acompanhando o volante.
+
+A estrada da floresta recebe marcas de pneus, brilho de pocas conforme a umidade e poeira em movimento (reduzida na chuva e na qualidade baixa). A floresta externa alterna densidade e clareiras; quatro recuos com bancos ficam junto a estrada, nas coordenadas X -1250, -650, 450 e 1100. Troncos caidos e bancos possuem colisao e ficam fora da faixa principal. Os bancos sao elementos de cenario.

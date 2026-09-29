@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import {dragOrbit,zoomOrbit} from './camera-orbit.js';
 import { catalog } from './buildings.js';
 export function bindControls({
   renderer,
@@ -35,7 +35,7 @@ export function bindControls({
     if (/^Digit[1-5]$/.test(e.code)) select(Object.keys(catalog)[Number(e.code.at(-1)) - 1]);
   });
   window.addEventListener('keyup', e => keys[e.code] = false);
-  window.addEventListener('blur', () => setPaused(true));
+  window.addEventListener('blur', () => {for(const key of Object.keys(keys))keys[key]=false;setPaused(true);});
   renderer.domElement.addEventListener('pointerdown', e => {
     drag = {
       x: e.clientX,
@@ -55,8 +55,8 @@ export function bindControls({
     if (drag) {
       if (Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 5) moved = true;
       if (moved && !paused) {
-        view.angle -= (e.clientX - drag.last) * .007;
-        editor?.look(e.clientY - drag.lastY);
+        dragOrbit(view,e.clientX-drag.last,e.clientY-drag.lastY,editor?.firstPerson);
+        editor?.look(e.clientY - drag.lastY,e.clientX - drag.last);
       }
       drag.last = e.clientX;
       drag.lastY = e.clientY;
@@ -80,7 +80,7 @@ export function bindControls({
   renderer.domElement.addEventListener('pointercancel', () => drag = null);
   renderer.domElement.addEventListener('wheel', e => {
     e.preventDefault();
-    view.zoom = THREE.MathUtils.clamp(view.zoom + e.deltaY * .015, 13, 39);
+    if(!current().paused)zoomOrbit(view,e.deltaY);
   }, {
     passive: false
   });

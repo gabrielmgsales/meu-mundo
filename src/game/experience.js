@@ -1,3 +1,4 @@
+import { windTime, windStrength } from './natural-effects.js';
 import * as THREE from 'three';
 import { LAKE, DOCK, WORLD } from './region.js';
 import { createEnvironment, sourcePan, weatherAt } from './environment.js';
@@ -211,7 +212,7 @@ export function createExperience({
     c.strokeStyle = '#638e88';
     c.lineWidth = 5 * scale;
     c.beginPath();
-    for (let z = -50; z <= 50; z++) c.lineTo(toX(riverCenter(z)), toY(z));
+    for (let z = WORLD.minZ; z <= WORLD.maxZ; z+=2) c.lineTo(toX(riverCenter(z)), toY(z));
     c.stroke();
     c.fillStyle = '#638e88';
     c.beginPath();
@@ -219,6 +220,7 @@ export function createExperience({
     c.fill();
     c.fillStyle = '#b49f71';
     c.fillRect(toX(DOCK.minX), toY(DOCK.minZ), (DOCK.maxX - DOCK.minX) * scale, 3 * scale);
+    if(state.truck){c.fillStyle='#e5b66b';c.fillRect(toX(state.truck.x)-2,toY(state.truck.z)-2,4,4);}
     if (state.boat) {
       c.fillStyle = '#fff4d0';
       c.beginPath();
@@ -299,6 +301,7 @@ export function createExperience({
     renderer.shadowMap.needsUpdate = true;
   }
   return {
+    vehicle(truck,throttle,brake,inside){audio.vehicle(truck,throttle,brake,inside);},
     ambience(strength, context = {}) {
       environmentContext = context;
       camera.updateMatrixWorld();
@@ -342,6 +345,7 @@ export function createExperience({
       }
       if (paused) return;
       shaderTime.value = time;
+      windTime.value=time;windStrength.value=.7+climate.rain*1.1;
       climate = weatherAt(state.day, state.time);
       const daylight = skyUpdate(state.time, climate.rain, time, camera.position);
       atmosphere.tick(dt, time, state.time, state.settings.quality);
@@ -405,7 +409,7 @@ export function createExperience({
       }
       particles.count = count;
       particles.instanceMatrix.needsUpdate = true;
-      if (moving) {
+      if (moving && !player.userData.swimming) {
         step += dt;
         if (step > (traveled / Math.max(dt, .001) > 4.5 ? .24 : .36)) {
           audio.play(environmentContext.surface === 'wood' ? 'step-wood' : environmentContext.sheltered ? 'step-stone' : climate.wet > .4 ? 'step-wet' : 'step');

@@ -96,18 +96,6 @@ export function createCartoonAtmosphere(scene, M) {
       phase: i * 2.4
     });
   }
-  // Sparse river reeds are instanced to keep their rendering inexpensive.
-  const reeds = new THREE.InstancedMesh(new THREE.CylinderGeometry(.014, .025, .6, 4), M.leaf, 100),
-    dummy = new THREE.Object3D();
-  for (let i = 0; i < 100; i++) {
-    const z = -40 + i * .8,
-      x = riverCenter(z) + (i % 2 ? 1 : -1) * (3.05 + Math.sin(i) * .1);
-    dummy.position.set(x, terrainHeight(x, z) + .27, z);
-    dummy.rotation.set(.12 * Math.sin(i), 0, .15 * Math.cos(i));
-    dummy.updateMatrix();
-    reeds.setMatrixAt(i, dummy.matrix);
-  }
-  root.add(reeds);
   return {
     root,
     clouds,

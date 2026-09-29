@@ -7,8 +7,16 @@ export function createPlayerMovement({
   arms,
   height,
   riverX,
+  waterAt = () => null,
   blocked
 }) {
+  player.rotation.order='YXZ';
+  let swimDepth=0, swimPhase=0;
+  const waterLevel=()=>{
+    const x=player.position.x,z=player.position.z;
+    if(onDock(x,z)||Math.abs(z)<1.4&&Math.abs(x-riverX(z))<3.8)return null;
+    return waterAt(x,z);
+  };
   let gaitPhase = 0,
     gaitWeight = 0,
     seatWeight = 0;
@@ -22,6 +30,8 @@ export function createPlayerMovement({
     pose,
     busy
   }) {
+    if(dt<=0)return;
+    const wasSwimming=!!player.userData.swimming;
     const seated = boating.occupied || pose && pose.active && pose.type === 'sit';
     const lying = pose && pose.active && pose.type === 'lie';
     const canMove = !pose || !pose.active;
@@ -36,7 +46,7 @@ export function createPlayerMovement({
       boating.step(dx, dz, angle, dt);
     } else if (canMove && moving) {
       const len = Math.hypot(dx, dz),
-        s = (keys.ShiftLeft || keys.ShiftRight ? 6 : 3.6) * dt;
+        s = (wasSwimming ? 2.6 : keys.ShiftLeft || keys.ShiftRight ? 6 : 3.6) * dt;
       dx /= len;
       dz /= len;
       const vx = (dx * Math.cos(angle) + dz * Math.sin(angle)) * s,
@@ -53,6 +63,25 @@ export function createPlayerMovement({
     if (!boating.occupied && !pose?.active) {
       player.position.y = onDock(player.position.x, player.position.z) ? DOCK.y : Math.abs(player.position.x - riverX(player.position.z)) < 3.8 && Math.abs(player.position.z) < 1.4 ? .64 : height(player.position.x, player.position.z);
     }
+    const level=waterLevel();
+    const swimming=!boating.occupied&&!pose?.active&&level!==null&&height(player.position.x,player.position.z)<level+.05;
+    player.userData.swimming=swimming;
+    if(swimming){
+      const vertical=busy?0:(keys.Space?1:0)-(keys.ControlLeft||keys.ControlRight||keys.KeyC?1:0);
+      if(!wasSwimming)swimDepth=0;
+      const maxDepth=Math.max(0,level-height(player.position.x,player.position.z)-.32);
+      swimDepth=THREE.MathUtils.clamp(swimDepth-vertical*dt*1.4,0,maxDepth);
+      player.position.y=Math.max(height(player.position.x,player.position.z)+.17,level-.15-swimDepth);
+      player.rotation.x=Math.PI/2 + (vertical<0?.18:vertical>0?-.18:0);
+      swimPhase+=dt*(moving||vertical?6:1.5);
+      body.position.y=1.02;body.rotation.set(0,0,0);
+      legs.forEach((leg,i)=>{leg.position.set((i?1:-1)*.16,.7,0);leg.rotation.set(Math.sin(swimPhase+i*Math.PI)*.24,0,0);});
+      arms.forEach((arm,i)=>{arm.position.set((i?1:-1)*.275,1.28,0);arm.rotation.set(swimPhase+i*Math.PI,0,(i?1:-1)*.22);});
+      player.userData.diving=swimDepth>.3;
+      lastWalkPosition.copy(player.position);
+      return;
+    }
+    swimDepth=0;player.userData.diving=false;
     player.rotation.x = lying ? -Math.PI / 2 : 0;
     const walkDistance = Math.hypot(player.position.x - lastWalkPosition.x, player.position.z - lastWalkPosition.z);
     lastWalkPosition.copy(player.position);
@@ -74,7 +103,7 @@ export function createPlayerMovement({
       }
     });
     arms.forEach((arm, i) => {
-      arm.position.set((i === 0 ? -1 : 1) * .36, 1.28, 0);
+      arm.position.set((i === 0 ? -1 : 1) * .275, 1.28, 0);
       arm.rotation.set(-.6 * seatWeight - Math.sin(gaitPhase + i * Math.PI) * .3 * gaitWeight * (1 - seatWeight) + Math.sin(elapsed * 2) * .025 * (1 - gaitWeight), 0, 0);
     });
   };

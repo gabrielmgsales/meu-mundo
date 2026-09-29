@@ -1,9 +1,9 @@
 // Double the 172 x 86 valley westwards, preserving every existing coordinate.
 export const WORLD = {
-  minX: -215,
-  maxX: 129,
-  minZ: -43,
-  maxZ: 43
+  minX: -1763,
+  maxX: 1677,
+  minZ: -860,
+  maxZ: 860
 };
 export const OVERLOOK = {
   x: -194,
@@ -66,9 +66,15 @@ export function lakeTerrain(x, z, land) {
   }
   const r = lakeRadius(x, z);
   if (r >= 1.16) return land;
-  const t = Math.max(0, Math.min(1, r < 1 ? (r - .85) / .15 : (r - 1) / .16)),
-    smooth = t * t * (3 - 2 * t);
-  return r < 1 ? LAKE.level - 2.4 + 2.44 * smooth : LAKE.level + .04 + (land - LAKE.level - .04) * smooth;
+  // Spread the descent across the whole basin instead of a narrow shoreline ring.
+  if (r < 1) {
+    const inward = 1 - r;
+    const descent = inward * inward * (3 - 2 * inward);
+    return LAKE.level + .04 - 10.04 * descent;
+  }
+  const t = Math.max(0, Math.min(1, (r - 1) / .16));
+  const smooth = t * t * (3 - 2 * t);
+  return LAKE.level + .04 + (land - LAKE.level - .04) * smooth;
 }
 export function canSail(x, z, heading = 0) {
   if (!inWorld(x, z, 2)) return false;

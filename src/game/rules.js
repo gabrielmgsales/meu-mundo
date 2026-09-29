@@ -1,3 +1,4 @@
+import { readTruck } from './driving.js';
 import { inWorld, readBoat } from './region.js';
 export const qualityPresets = {
   low: {
@@ -66,6 +67,7 @@ export function readProgress(saved, catalog) {
   if (typeof saved.settings?.sound === 'boolean') state.settings.sound = saved.settings.sound;
   if (Number.isFinite(saved.settings?.volume)) state.settings.volume = Math.max(0, Math.min(1, saved.settings.volume));
   state.boat = readBoat(saved.boat);
+  state.truck = readTruck(saved.truck);
   return state;
 }
 export function isUnlocked(type, state) {

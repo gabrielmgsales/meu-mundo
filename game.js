@@ -1,3 +1,9 @@
+import {weatherAt} from './src/game/environment.js';
+import {updateVehicleOrbit,orbitPosition} from './src/game/camera-orbit.js';
+import {crossingHeight,createCrossings} from './src/game/crossings.js';
+import { createDriving } from './src/game/driving.js';
+import { createExpandedWorld } from './src/game/expanded-world.js';
+import { rockSurface } from './src/game/natural-effects.js';
 import { rockGeometry, addShoreDetail } from './src/game/landscape-detail.js';
 import { detailTerrain } from './src/game/terrain-surface.js';
 import { createRoadMaterial } from './src/game/road-material.js';
@@ -21,6 +27,7 @@ import { createBoating } from './src/game/boating.js';
 let experience,
   editor,
   boating,
+  driving, expansion,
   worldBatched = false;
 const editable = [];
 const $ = id => document.getElementById(id);
@@ -89,6 +96,7 @@ const M = {
     emissiveIntensity: .65
   }),
   water: mat('#497477', {
+    side: THREE.DoubleSide,
     roughness: .23,
     metalness: .05,
     transparent: true,
@@ -96,6 +104,7 @@ const M = {
   })
 };
 const earthTexture = textureMaterials(M);
+rockSurface(M.stone);
 function mesh(geo, m, p, x = 0, y = 0, z = 0) {
   const o = new THREE.Mesh(geo, m);
   o.position.set(x, y, z);
@@ -112,13 +121,13 @@ function rand() {
   seed = seed * 1664525 + 1013904223 >>> 0;
   return seed / 4294967296;
 }
-const height = (x, z) => onOverlook(x, z) ? OVERLOOK.y : editor ? editor.terrainHeight(x, z) : terrainHeight(x, z),
+const height = (x, z) => crossingHeight(x,z) ?? (onOverlook(x, z) ? OVERLOOK.y : editor ? editor.terrainHeight(x, z) : terrainHeight(x, z)),
   riverX = riverCenter;
 let groundSeed = 417;
 const groundRand = () => (groundSeed = Math.imul(groundSeed, 1664525) + 1013904223 >>> 0) / 4294967296;
-const tg = new THREE.PlaneGeometry(480, 190, 356, 140);
+const tg = new THREE.PlaneGeometry(640, 320, 640, 320);
 tg.rotateX(-Math.PI / 2);
-tg.translate(-45, 0, 0);
+tg.translate(-40, 0, 0);
 const tp = tg.attributes.position,
   colors = [];
 for (let i = 0; i < tp.count; i++) {
@@ -139,7 +148,7 @@ ground.castShadow = false;
 detailTerrain(ground.material);
 // Preserve the old random stream so saved tree/rock identifiers never change.
 for (let i = 0; i < 141 * 141 * 3; i++) rand();
-const wg = new THREE.PlaneGeometry(4.8, 180, 10, 100);
+const wg = new THREE.PlaneGeometry(4.8, WORLD.maxZ-WORLD.minZ+60, 10, 1720);
 wg.rotateX(-Math.PI / 2);
 const wp = wg.attributes.position;
 for (let i = 0; i < wp.count; i++) {
@@ -165,6 +174,9 @@ const ripples = new THREE.LineSegments(lg, new THREE.LineBasicMaterial({
 ripples.visible = false;
 scene.add(ripples);
 const pathMat = createRoadMaterial();
+for(const z of [-120,120]){addTrail(scene,[[-700,z],[-300,z],[-40,z]],2.1,pathMat);addTrail(scene,[[30,z],[300,z],[620,z]],2.1,pathMat);}
+addTrail(scene,[[-700,0],[-500,0],[-300,0],[-205,0]],2.1,pathMat);
+addTrail(scene,[[135,0],[300,0],[480,0],[620,0]],2.1,pathMat);
 addTrail(scene, [[-4, -34], [-4, -15], [-3, -4], [-3, 4], [-1, 14], [-5, 35]], 1.15, pathMat);
 addTrail(scene, [[-3, 1], [1, 0], [5.5, 0]], .8, pathMat);
 addTrail(scene, [[12.8, 0], [17, -4], [21, -11], [24, -15]], .6, pathMat);
@@ -172,7 +184,7 @@ addTrail(scene, [[-4, -12], [-10, -14], [-16, -18], [-20, -18]], .55, pathMat);
 addTrail(scene, [[14, 1], [19, 9], [22, 16], [23, 20]], .6, pathMat);
 for (let i = 0; i < 15; i++) {
   const x = -65 + i * 10,
-    z = -57 - rand() * 15;
+    z = WORLD.minZ - 60 - rand() * 15;
   const width = 12 + rand() * 10,
     tall = 20 + rand() * 22;
   const hill = mesh(rockGeometry(i), mat(i % 2 ? '#73786d' : '#85867a'), scene, x, 5, z);
@@ -298,6 +310,7 @@ building('cabin', -5, -5);
 building('field', 0, -5);
 building('fence', -8, -2);
 building('fence', -10, -2);
+createCrossings(scene);
 const bridge = new THREE.Group();
 bridge.position.set(riverX(0), .5, 0);
 scene.add(bridge);
@@ -520,8 +533,9 @@ function place() {
 function blocked(x, z) {
   if (!inWorld(x, z) || mountainBlocked(x, z) || overlookRailing(x, z)) return true;
   if (onDock(x, z)) return editor?.objectBlocks(x, z) || false;
-  if (editor) return editor.blocked(x, z) || editor.objectBlocks(x, z);
-  if (inLake(x, z) || Math.abs(x - riverX(z)) < 2.8 && Math.abs(z) > 1.15) return true;
+  if (expansion?.blocked(x,z))return true;
+  if (editor) return editor.objectBlocks(x, z);
+
   return editable.some(e => e.g.visible && e.radius && Math.hypot(x - e.g.position.x, z - e.g.position.z) < e.radius);
 }
 let last = performance.now(),
@@ -593,7 +607,8 @@ const stepPlayer = createPlayerMovement({
   arms,
   height,
   riverX,
-  blocked
+  waterAt: (x,z) => crossingHeight(x,z)!==null ? null : editor?.waterAt(x,z) ?? null,
+  blocked: (x,z) => blocked(x,z) || !!driving?.blocks(x,z)
 });
 bindControls({
   renderer,
@@ -606,11 +621,12 @@ bindControls({
   }),
   select,
   setPaused,
-  collect,
+  collect: () => driving?.nearby ? driving.interact() : collect(),
   aim,
   place
 });
 editor = createCreative({
+  terrainSurfaces:()=>expansion?.surfaces() || [],
   buildOptions: Object.entries(catalog).filter(([id]) => !['boat', 'deck', 'mountain', 'waterfall'].includes(id)).map(([id, c]) => ({
     id,
     label: c.label,
@@ -618,6 +634,7 @@ editor = createCreative({
   })),
   onBuild: select,
   visitOverlook: hour => {
+    if (driving?.occupied) return toast('Saia da picape antes de viajar.');
     if (boating.occupied) return toast('Desembarque antes de visitar o mirante.');
     if (Number.isFinite(hour)) state.time = hour;
     editor.clearPose();
@@ -657,9 +674,17 @@ editor = createCreative({
   isPaused: () => paused
 });
 if (!state.boat?.occupied && blocked(player.position.x, player.position.z)) player.position.set(-3, height(-3, 3), 3);
+expansion=createExpandedWorld(scene,M);
+expansion.tick(player.position);
+driving=createDriving({scene,player,state,home:initialHome.position,height:(x,z)=>Math.abs(z)<1.4&&Math.abs(x-riverX(z))<3.8?.64:height(x,z),blocked:(x,z)=>!inWorld(x,z,2)||overlookRailing(x,z)||!!expansion?.blocked(x,z)||editor.objectBlocks(x,z)||lakeRegion.rocks.some(r=>Math.hypot((x-r.position.x)/Math.max(1,r.scale.x*.8),(z-r.position.z)/Math.max(1,r.scale.z*.8))<1),waterAt:(x,z)=>crossingHeight(x,z)!==null?null:Math.abs(z)<1.15&&Math.abs(x-riverX(z))<3.8?null:editor.waterAt(x,z),boating,editor:()=>editor,save,toast});
 camera.position.set(player.position.x + 4, player.position.y + 12, player.position.z + 22);
 updateUI();
 toast('Bem-vindo ao Vale Verde. Sua história começa aqui.');
+const truckButton=document.createElement('button');
+truckButton.id='truck-interact';truckButton.textContent='Entrar na Hilux [E]';truckButton.hidden=true;
+truckButton.style.cssText='position:fixed;right:24px;bottom:28px;z-index:4;padding:12px 18px;background:#28343b;color:#eef2f2;border:1px solid #77878c;border-radius:4px;cursor:pointer';
+truckButton.onclick=()=>{if(!paused&&driving.nearby)driving.interact();};
+document.body.append(truckButton);
 function animate(now) {
   requestAnimationFrame(animate);
   const dt = Math.min((now - last) / 1000, .05);
@@ -671,7 +696,11 @@ function animate(now) {
       state.time -= 24;
       state.day++;
     }
-    stepPlayer({
+    const roadWet=weatherAt(state.day,state.time).wet;
+    expansion.tick(player.position,roadWet);
+    pathMat.userData.wet.value=roadWet;
+    driving.tick(dt,keys);
+    if(!driving.occupied)stepPlayer({
       dt,
       elapsed,
       keys,
@@ -686,6 +715,8 @@ function animate(now) {
     saveTick += dt;
     if (uiTick > .2) {
       interaction();
+      if(driving.nearby)$('interaction').textContent=driving.prompt;
+      if(player.userData.swimming) $('interaction').textContent='Nadar: setas / WASD ? Mergulhar: Ctrl ou C ? Subir: Espa?o ? C?mera: V';
       updateClock();
       uiTick = 0;
     }
@@ -694,16 +725,21 @@ function animate(now) {
       saveTick = 0;
     }
   }
+  truckButton.hidden=paused||!driving.nearby;
+  truckButton.textContent=driving.occupied?'Sair da Hilux [E]':'Entrar na Hilux [E]';
   boating.tick(paused ? 0 : dt, elapsed);
   lakeRegion.tick(paused ? 0 : dt, elapsed, experience.ripple);
   westRegion.tick(state.time);
-  desired.set(player.position.x + Math.sin(view.angle) * view.zoom, player.position.y + view.zoom * .49, player.position.z + Math.cos(view.angle) * view.zoom);
+  updateVehicleOrbit(view,driving.occupied?state.truck.heading:null);
+  orbitPosition(desired,player.position,view,player.userData.swimming?(player.userData.diving?.12:.28):1);
   camera.position.lerp(desired, 1 - Math.exp(-dt * 5));
-  camera.position.y = Math.max(camera.position.y, height(camera.position.x, camera.position.z) + 2);
+  camera.position.y = Math.max(camera.position.y, height(camera.position.x, camera.position.z) + (player.userData.swimming ? .15 : 2));
   look.copy(player.position);
-  look.y += .8;
+  look.y += player.userData.swimming ? .1 : .8;
+  camera.up.set(0,1,0);
   camera.lookAt(look);
-  editor.camera(view.angle, desired, look, dt);
+  if(!driving.occupied)editor.camera(view.angle, desired, look, dt);
+  driving.camera(camera,editor.firstPerson,editor.cabinLook.yaw,editor.cabinLook.pitch);
   editor.tick(paused ? 0 : dt, elapsed);
   preview.visible = !!selected && hasPoint && !paused;
   if (preview.visible) {
@@ -713,7 +749,8 @@ function animate(now) {
     preview.scale.setScalar(catalog[selected].radius / 1.5);
     preview.material.color.set(placementValid(x, z) ? '#e6d59b' : '#ed8064');
   }
-  experience.tick(paused ? 0 : dt, elapsed, !boating.occupied && !editor.pose.active && !!(keys.KeyW || keys.KeyA || keys.KeyS || keys.KeyD || keys.ArrowUp || keys.ArrowDown || keys.ArrowLeft || keys.ArrowRight), paused);
+  experience.tick(paused ? 0 : dt, elapsed, !boating.occupied && !driving.occupied && !editor.pose.active && !!(keys.KeyW || keys.KeyA || keys.KeyS || keys.KeyD || keys.ArrowUp || keys.ArrowDown || keys.ArrowLeft || keys.ArrowRight), paused);
+  experience.vehicle(state.truck,Number(!!(keys.KeyW||keys.ArrowUp))-Number(!!(keys.KeyS||keys.ArrowDown)),!!keys.Space||!!(keys.KeyS||keys.ArrowDown),editor.firstPerson);
   renderer.render(scene, camera);
   $('game').dataset.drawCalls = String(renderer.info.render.calls);
   $('game').dataset.triangles = String(renderer.info.render.triangles);

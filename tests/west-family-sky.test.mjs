@@ -10,7 +10,7 @@ import { readCreative,addLakeBrush } from '../src/game/creative-state.js';
 import { createItem } from '../src/game/models.js';
 
 test('western expansion doubles the previous playable area and has a continuous climb',()=>{
-  assert.equal((WORLD.maxX-WORLD.minX)*86,2*172*86);
+  assert.equal((WORLD.maxX-WORLD.minX)*(WORLD.maxZ-WORLD.minZ),200*344*86);
   let previous=terrainHeight(-75,0);
   for(let x=-75.1;x>=-194;x-=.1){const next=terrainHeight(x,0);assert.ok(Math.abs(next-previous)<.12);previous=next;}
   assert.ok(previous>70);assert.ok(Math.abs(OVERLOOK.y-previous)<.2);

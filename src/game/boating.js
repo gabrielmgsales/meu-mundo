@@ -69,6 +69,7 @@ export function createBoating({
     toast('Barco pronto ao lado do deck, no lago a leste.');
   }
   function interact() {
+    if(state.truck?.occupied){toast('Saia da picape primeiro.');return true;}
     const b = state.boat;
     if (!b) return false;
     if (!b.occupied) {
@@ -129,6 +130,7 @@ export function createBoating({
     recall,
     interact,
     visit() {
+      if(state.truck?.occupied){toast('Saia da picape primeiro.');return;}
       if (state.boat?.occupied) {
         toast('Desembarque antes de viajar.');
         return;

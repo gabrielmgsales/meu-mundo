@@ -1,3 +1,4 @@
+import { windMaterial } from './natural-effects.js';
 import { foliageGeometry } from './foliage.js';
 import { createPanoramicSky } from './sky.js';
 import * as THREE from 'three';
@@ -10,7 +11,9 @@ export function terrainHeight(x, z) {
   const hills = (Math.sin(x * .095) * Math.cos(z * .11) + 1) * 1.35 + .55 * Math.sin(z * .21 + x * .1);
   const land = .42 + settlement * hills + .12 * Math.sin(x * .24) * Math.cos(z * .18);
   // Cut an actual bed; blend the banks into the hills without hiding the water.
-  return westTerrain(x, z, lakeTerrain(x, z, THREE.MathUtils.lerp(-.65, land, THREE.MathUtils.smoothstep(bank, 2.05, 4.6))));
+  const originalBed = THREE.MathUtils.lerp(-.65, land, THREE.MathUtils.smoothstep(bank, 2.05, 4.6));
+  const riverBed = originalBed < .25 ? .25 - (.25 - originalBed) * 3 : originalBed;
+  return westTerrain(x, z, lakeTerrain(x, z, riverBed));
 }
 function seeded(seed) {
   return () => (seed = seed * 1664525 + 1013904223 >>> 0) / 4294967296;
@@ -138,10 +141,10 @@ export function makeTree(parent, M, x, z, scale, pine, random) {
   const group = new THREE.Group();
   group.position.set(x, terrainHeight(x, z), z);
   const hash = n => {const v=Math.sin(x*127.1+z*311.7+n*74.7)*43758.5453;return v-Math.floor(v);};
-  const spread = 1.18 + hash(1) * .35;
-  group.scale.set(scale*spread, scale*(.82+hash(2)*.64), scale*spread);
+  const spread = 1.38 + hash(1) * .4;
+  group.scale.set(scale*spread*1.5, scale*(1.08+hash(2)*.72)*1.5, scale*spread*1.5);
   const foliageTint=hash(3);
-  for(const material of [M.leaf,M.leaf2,M.pine]) material.vertexColors=true;
+  for(const material of [M.leaf,M.leaf2,M.pine]) {material.vertexColors=true;windMaterial(material);}
   group.rotation.y = random() * Math.PI * 2;
   parent.add(group);
   const limb = (from, to, radius) => {

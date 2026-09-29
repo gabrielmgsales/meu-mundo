@@ -3,7 +3,7 @@ import { ValleyAudio } from './game/audio.js';
 const screen = document.createElement('main');
 screen.id = 'welcome';
 screen.innerHTML = `<div class="welcome-landscape" aria-hidden="true"><i></i><i></i><i></i></div>
-  <section class="welcome-copy"><small>UM LUGAR PARA CHAMAR DE SEU</small><h1>Meu Mundo<span>Vale Verde</span></h1><p>O riacho segue seu caminho.<br>O resto da história é você quem cria.</p><button id="menu-sound" aria-pressed="false">♫ Ativar música e natureza</button>
+  <section class="welcome-copy"><small>UM LUGAR PARA CHAMAR DE SEU</small><h1>Meu Mundo<span>Vale Verde</span></h1><p>O riacho segue seu caminho.<br>O resto da história é você quem cria.</p><button id="menu-sound" aria-pressed="false">Ativar sons da natureza</button>
     <button id="play-quickstart" class="play-quickstart" type="button" aria-label="Jogar agora"><span class="play-icon" aria-hidden="true">▶</span><span>Jogar</span></button>
   </section>
   <section class="world-card"><small>SUA PRÓXIMA HISTÓRIA</small><h2>Entre no seu mundo</h2>
@@ -13,15 +13,15 @@ screen.innerHTML = `<div class="welcome-landscape" aria-hidden="true"><i></i><i>
 document.body.append(screen);
 document.body.classList.add('in-menu');
 const audio = new ValleyAudio();
-let musicTimer,
+let ambienceTimer,
   busy = false;
 document.getElementById('menu-sound').onclick = async e => {
   await audio.unlock();
   audio.enabled = e.target.getAttribute('aria-pressed') !== 'true';
   audio.apply();
   e.target.setAttribute('aria-pressed', String(audio.enabled));
-  e.target.textContent = audio.enabled ? '♫ Música e natureza ligadas' : '♫ Ativar música e natureza';
-  if (!musicTimer) musicTimer = setInterval(() => {
+  e.target.textContent = audio.enabled ? 'Sons da natureza ligados' : 'Ativar sons da natureza';
+  if (!ambienceTimer) ambienceTimer = setInterval(() => {
     audio.ambience(0.2);
     audio.play('bird');
   }, 4500);
@@ -57,7 +57,7 @@ async function enter(world) {
   chooseWorld(world);
   try {
     await import('../game.js');
-    clearInterval(musicTimer);
+    clearInterval(ambienceTimer);
     await audio.context?.close();
     screen.remove();
     document.body.classList.remove('in-menu');
